@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -23,10 +22,10 @@ class ClientController extends Controller
                 'data' => $clients
             ], 200);
         } catch (Exception $e) {
-            Log::error("Erro ao listar clientes: " . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Não foi possível recuperar a lista de clientes.'
+                'message' => 'Não foi possível recuperar a lista de clientes.',
+                'msg_error' => "Erro ao recuperar lista de clientes: " . $e->getMessage()
             ], 500);
         }
     }
@@ -39,7 +38,7 @@ class ClientController extends Controller
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',
-                'document' => 'required|string|unique:clients,document|max:20',
+                'document' => 'required|string|unique:clients',
                 'credit_balance' => 'nullable|numeric|min:0'
             ]);
 
@@ -58,10 +57,10 @@ class ClientController extends Controller
                 'errors' => $e->errors()
             ], 422);
         } catch (Exception $e) {
-            Log::error("Erro ao criar cliente: " . $e->getMessage());
             return response()->json([
                 'status' => 'error',
-                'message' => 'Erro interno ao salvar o cliente.'
+                'message' => "Erro ao criar cliente!",
+                'msg_error' => "Erro ao criar cliente: " . $e->getMessage()
             ], 500);
         }
     }
@@ -85,7 +84,8 @@ class ClientController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'status' => 'error',
-                'message' => 'Erro ao buscar cliente.'
+                'message' => 'Erro ao buscar cliente.',
+                'msg_error' => "Erro ao buscar cliente: " . $e->getMessage()
             ], 500);
         }
     }
@@ -99,9 +99,9 @@ class ClientController extends Controller
             $client = Client::findOrFail($id);
 
             $validated = $request->validate([
-                'name' => 'sometimes|string|max:255',
-                'document' => 'sometimes|string|max:20|unique:clients,document,' . $id,
-                'credit_balance' => 'sometimes|numeric|min:0'
+                'name' => 'required|string|max:255',
+                'document' => 'required|string|unique:clients',
+                'credit_balance' => 'nullable|numeric|min:0'
             ]);
 
             $client->update($validated);
@@ -113,9 +113,16 @@ class ClientController extends Controller
             ], 200);
 
         } catch (ModelNotFoundException $e) {
-            return response()->json(['status' => 'error', 'message' => 'Cliente não encontrado.'], 404);
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Cliente não encontrado.'
+            ], 404);
         } catch (Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Erro ao atualizar cliente.'], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Erro ao atualizar cliente.',
+                'msg_error' => "Erro ao atualizar cliente: " . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -133,9 +140,17 @@ class ClientController extends Controller
                 'message' => 'Cliente removido com sucesso.'
             ], 200);
         } catch (ModelNotFoundException $e) {
-            return response()->json(['status' => 'error', 'message' => 'Cliente não encontrado.'], 404);
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Cliente não encontrado.',
+                'msg_error' => "Cliente não encontrado: " . $e->getMessage()
+            ], 404);
         } catch (Exception $e) {
-            return response()->json(['status' => 'error', 'message' => 'Erro ao remover cliente.'], 500);
+            return response()->json([
+                'status' => 'error', 
+                'message' => 'Erro ao remover cliente.',
+                'msg_error' => "Erro ao remover cliente: " . $e->getMessage()
+            ], 500);
         }
     }
 

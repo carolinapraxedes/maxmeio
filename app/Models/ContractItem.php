@@ -13,4 +13,9 @@ class ContractItem extends Model
     {
         return $this->belongsTo(Contract::class);
     }
+
+    protected $casts = [
+        'unit_price' => 'decimal:2', 
+        'quantity'   => 'integer'
+    ];
 }

@@ -20,4 +20,8 @@ class Client extends Model
     {
         return $this->hasManyThrough(Billing::class, Contract::class);
     }
+
+    protected $casts = [
+        'credit_balance' => 'decimal:2',
+    ];
 }

@@ -22,8 +22,16 @@ class Billing extends Model
     {
         return [
             'status' => BillingStatus::class,
+            'total_amount' => 'float',
+            'paid_amount' => 'float',
             'due_date' => 'date',
         ];
+    }
+    protected $appends = ['remaining_amount'];
+
+    public function getRemainingAmountAttribute(): float
+    {
+        return (float) max(0, $this->total_amount - $this->paid_amount);
     }
 
     public function contract(): BelongsTo

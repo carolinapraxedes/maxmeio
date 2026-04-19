@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('document');
             $table->decimal('credit_balance',15,2)->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
