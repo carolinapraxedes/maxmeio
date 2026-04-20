@@ -13,12 +13,35 @@ enum BillingStatus: string
 
     public function canTransitionTo(BillingStatus $newStatus): bool
     {
+        
+        if ($this === $newStatus) return true;
+
         return match($this) {
+            // pendente -> aguardando_pagamento
             self::PENDING => $newStatus === self::AWAITING_PAYMENT,
-            self::AWAITING_PAYMENT => in_array($newStatus, [self::PAID, self::PARTIAL_PAID, self::OVERDUE]),
+
+            // aguardando_pagamento -> pago OR pago_parcial OR inadimplente
+            self::AWAITING_PAYMENT => in_array($newStatus, [
+                self::PAID, 
+                self::PARTIAL_PAID, 
+                self::OVERDUE
+            ]),
+
+            // pago_parcial -> pago
+            self::PARTIAL_PAID => $newStatus === self::PAID,
+
+            // inadimplente -> negociando
             self::OVERDUE => $newStatus === self::NEGOTIATING,
-            self::NEGOTIATING => in_array($newStatus, [self::PAID, self::CANCELLED]),
-            self::PAID, self::CANCELLED => false, // Estados finais
+
+            // negociando -> pago OR cancelado
+            self::NEGOTIATING => in_array($newStatus, [
+                self::PAID, 
+                self::CANCELLED
+            ]),
+
+            // Estados finais (pago e cancelado não saem para lugar nenhum)
+            self::PAID, self::CANCELLED => false,
+
             default => false,
         };
     }

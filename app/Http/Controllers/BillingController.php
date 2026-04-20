@@ -7,6 +7,8 @@ use App\Models\Billing;
 use App\Models\Contract;
 use Exception;
 use App\Enums\BillingStatus;
+use App\Exceptions\TransitionException;
+use App\Services\BillingService;
 
 class BillingController extends Controller
 {
@@ -97,7 +99,7 @@ class BillingController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    /**public function update(Request $request, $id)
     {
         try {
             $billing = Billing::findOrFail($id);
@@ -147,6 +149,27 @@ class BillingController extends Controller
                 'code' => 500,
                 'msg_error' => $e->getMessage()
             ], 500);
+        }
+    }*/
+
+    public function update(Request $request, $id, BillingService $service)
+    {
+        $billing = Billing::findOrFail($id);
+        
+        try {
+            $updatedBilling = $service->updateStatus($billing, $request->all());
+            
+            return response()->json([
+                'status' => 'success',
+                'data' => $updatedBilling
+            ]);
+            
+        } catch (TransitionException $e) {
+            return response()->json([
+                'status' => 'error',
+                'code' => 500,
+                'message' => $e->getMessage()
+            ], 422);
         }
     }
 
