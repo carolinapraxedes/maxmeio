@@ -16,7 +16,7 @@ return new class extends Migration
 
             // Aqui o cascade é recomendado: se o contrato for deletado, os itens perdem o sentido.
             $table->foreignId('contract_id')->constrained('contracts')->onDelete('cascade');
-            $table->string('description');
+            $table->text('description');
             $table->integer('quantity');            
             $table->decimal('unit_price', 15, 2); 
         

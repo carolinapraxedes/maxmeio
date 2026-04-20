@@ -25,7 +25,7 @@ return new class extends Migration
             $table->decimal('estimated_hours', 8, 2);
             $table->decimal('actual_hours', 8, 2)->default(0);
             
-            // Status atual da OS
+            
             $table->string('status'); 
             
             $table->timestamps();
@@ -38,6 +38,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('_service_order');
+        Schema::dropIfExists('service_order');
     }
 };

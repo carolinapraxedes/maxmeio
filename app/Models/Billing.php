@@ -5,9 +5,12 @@ namespace App\Models;
 use App\Enums\BillingStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Billing extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'contract_id', 
         'status', 
