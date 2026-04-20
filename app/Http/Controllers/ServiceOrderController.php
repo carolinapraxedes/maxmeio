@@ -14,7 +14,7 @@ class ServiceOrderController extends Controller
     public function index()
     {
         try {
-            $serviceOrders = ServiceOrder::with(['contract.client', 'user'])->get();
+            $serviceOrders = ServiceOrder::with(['contract.client', 'user','statusHistory'])->get();
 
             return response()->json([
                 'status' => 'success',

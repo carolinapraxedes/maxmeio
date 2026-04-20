@@ -22,5 +22,5 @@ Route::apiResource('clients', ClientController::class);
 Route::apiResource('contracts', ContractController::class);
 Route::apiResource('contract-items', ContractItemController::class)->except(['index', 'show']);
 Route::apiResource('billings', BillingController::class)->except(['show', 'delete']);
-Route::apiResource('service-orders', ServiceOrderController::class)->except(['show', 'delete']);
+Route::apiResource('service-orders', ServiceOrderController::class);
 Route::get('service-orders/{serviceOrder}/history', [ServiceOrderStatusController::class, 'index']);

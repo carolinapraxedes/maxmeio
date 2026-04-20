@@ -19,7 +19,7 @@ class DatabaseSeeder extends Seeder
             ContractSeeder::class,
             BillingSeeder::class,
             ServiceOrderSeeder::class,
-            ServiceOrderStatusHistorySeeder::class,
+
             
         ]);
     }

@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\ServiceOrder;
+use App\Models\ServiceOrderStatusHistory;
 
 class ServiceOrderObserver
 {
@@ -11,7 +12,14 @@ class ServiceOrderObserver
      */
     public function created(ServiceOrder $serviceOrder): void
     {
-        //
+        // Registra o "nascimento" da OS no histórico
+        ServiceOrderStatusHistory::create([
+            'service_order_id' => $serviceOrder->id,
+            'user_id'          => $serviceOrder->user_id, 
+            'old_status'       => null,
+            'new_status'       => $serviceOrder->status,
+            'changed_at'       => now(),
+        ]);
     }
 
     /**
@@ -19,7 +27,16 @@ class ServiceOrderObserver
      */
     public function updated(ServiceOrder $serviceOrder): void
     {
-        //
+        dump('chegou no observer');
+        if ($serviceOrder->isDirty('status')) {
+            ServiceOrderStatusHistory::create([
+                'service_order_id' => $serviceOrder->id,
+                'user_id'          => $serviceOrder->user_id,
+                'old_status'       => $serviceOrder->getOriginal('status'), 
+                'new_status'       => $serviceOrder->status,                
+                'changed_at'       => now(),
+            ]);
+        }
     }
 
     /**

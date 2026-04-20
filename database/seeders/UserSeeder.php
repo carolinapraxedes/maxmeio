@@ -32,9 +32,9 @@ class UserSeeder extends Seeder
 
         // Usuário Operador (Quem faz as OS)
         User::factory()->create([
-            'name' => 'Operator User',
-            'email' => 'operator@agencia.com',
-            'role' => 'operator',
+            'name' => 'os_manager User',
+            'email' => 'os_manager@agencia.com',
+            'role' => 'os_manager',
             'password' => Hash::make('password'),
         ]);
 

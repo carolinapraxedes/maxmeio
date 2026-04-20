@@ -43,6 +43,6 @@ class ServiceOrder extends Model
      */
     public function statusHistory(): HasMany
     {
-        return $this->hasMany(ServiceOrderStatusHistory::class);
+        return $this->hasMany(ServiceOrderStatusHistory::class, 'service_order_id');
     }
 }
