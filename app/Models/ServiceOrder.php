@@ -12,7 +12,7 @@ class ServiceOrder extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $table = 'service_order'; // Nome definido na sua migration
+    protected $table = 'service_orders'; 
 
     protected $fillable = [
         'contract_id',

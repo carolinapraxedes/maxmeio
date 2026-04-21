@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Billing;
 use App\Models\ServiceOrder;
+use App\Observers\BillingObserver;
 use App\Observers\ServiceOrderObserver;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,5 +24,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         ServiceOrder::observe(ServiceOrderObserver::class);
+        Billing::observe(BillingObserver::class);
     }
 }
