@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\ContractItemController;
+use App\Http\Controllers\CreditController;
 use App\Http\Controllers\ServiceOrderController;
 
 use Illuminate\Http\Request;
@@ -31,7 +32,7 @@ Route::middleware(['auth:sanctum', 'throttle:cobrancas_limiter'])->group(functio
     Route::get('/cobrancas', [BillingController::class, 'index']);
     
     
-   //Route::post('/clientes/{id}/aplicar-credito', [CreditController::class, 'apply']);
+   Route::post('/clientes/{id}/aplicar-credito', [CreditController::class, 'apply'])->middleware('can:manual credit');;
 
     // --- Outros Recursos (CRUDs) ---
     Route::apiResource('clients', ClientController::class);

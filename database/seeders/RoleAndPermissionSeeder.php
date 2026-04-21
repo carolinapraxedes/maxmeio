@@ -17,6 +17,9 @@ class RoleAndPermissionSeeder extends Seeder
         Permission::create(['name' => 'manual credit']); 
         Permission::create(['name' => 'manage service orders']); 
 
+        $admin = Role::create(['name' => 'admin']);
+        $admin->givePermissionTo(Permission::all());
+
         
         $financial = Role::create(['name' => 'financial']);
         $financial->givePermissionTo('manual credit');

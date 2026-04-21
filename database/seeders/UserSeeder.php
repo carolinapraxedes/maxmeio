@@ -14,29 +14,32 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        // Usuário Administrador
-        User::factory()->create([
-            'name' => 'Admin User',
+// 1. Criar Utilizador Administrador (Acesso Total)
+        $admin = User::create([
+            'name' => 'Admin Sistema',
             'email' => 'admin@agencia.com',
-            'role' => 'admin',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('password'), 
+            'email_verified_at' => now(),
         ]);
+        $admin->assignRole('admin');
 
-        // Usuário Financeiro (Crítico para o teste)
-        User::factory()->create([
-            'name' => 'Finance User',
-            'email' => 'finance@agencia.com',
-            'role' => 'finance',
-            'password' => Hash::make('password'),
-        ]);
 
-        // Usuário Operador (Quem faz as OS)
-        User::factory()->create([
-            'name' => 'os_manager User',
-            'email' => 'os_manager@agencia.com',
-            'role' => 'os_manager',
+        $financial = User::create([
+            'name' => 'Ana Financeiro',
+            'email' => 'financeiro@agencia.com',
             'password' => Hash::make('password'),
+            'email_verified_at' => now(),
         ]);
+        $financial->assignRole('financial');
+
+
+        $manager = User::create([
+            'name' => 'Bruno Gestor OS',
+            'email' => 'os@agencia.com',
+            'password' => Hash::make('password'),
+            'email_verified_at' => now(),
+        ]);
+        $manager->assignRole('os_manager');
 
         
         User::factory(5)->create();

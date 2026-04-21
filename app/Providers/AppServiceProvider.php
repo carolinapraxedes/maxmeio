@@ -9,7 +9,8 @@ use App\Observers\ServiceOrderObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Http\Request;   
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,11 @@ class AppServiceProvider extends ServiceProvider
         ServiceOrder::observe(ServiceOrderObserver::class);
         Billing::observe(BillingObserver::class);
         $this->configureRateLimiting();
+        //super admin
+        Gate::before(function ($user, $ability) {
+            return $user->hasRole('admin') ? true : null;
+        });
+
     }
     protected function configureRateLimiting(): void
     {
