@@ -27,7 +27,7 @@ class ServiceOrderObserver
      */
     public function updated(ServiceOrder $serviceOrder): void
     {
-        dump('chegou no observer');
+        
         if ($serviceOrder->isDirty('status')) {
             ServiceOrderStatusHistory::create([
                 'service_order_id' => $serviceOrder->id,
