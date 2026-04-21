@@ -5,14 +5,18 @@ namespace App\Http\Controllers;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth; // Importante para identificar o user
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // 1. Envelopa tudo no Cache::remember
-        // 'dashboard_data' é a chave, 300 são os 5 minutos em segundos
-        return Cache::remember('dashboard_data', 300, function () 
+        // Sugestão: Cachear por usuário para evitar que um veja dados do outro 
+        // caso existam permissões diferentes no futuro.
+        $userId = Auth::id();
+
+        return Cache::remember("dashboard_data_{$userId}", 300, function () 
         {
             $startOfMonth = Carbon::now()->startOfMonth()->format('Y-m-d H:i:s');
             $startOfLastMonth = Carbon::now()->subMonth()->startOfMonth()->format('Y-m-d H:i:s');
@@ -48,7 +52,6 @@ class DashboardController extends Controller
             $anterior = (float) $result->total_mes_anterior;
             $variacao = $anterior > 0 ? (($atual - $anterior) / $anterior) * 100 : ($atual > 0 ? 100 : 0);
 
-            // Importante: O cache precisa retornar o ARRAY de dados
             return [
                 'faturamento' => [
                     'mes_atual' => round($atual, 2),
@@ -62,6 +65,6 @@ class DashboardController extends Controller
                 'top_clientes' => json_decode($result->top_5_clients),
                 'distribuicao_os' => json_decode($result->os_distribution)
             ];
-        });
+        }); 
     }
 }

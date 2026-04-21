@@ -6,11 +6,10 @@ use App\Models\Billing;
 use App\Models\ServiceOrder;
 use App\Observers\BillingObserver;
 use App\Observers\ServiceOrderObserver;
-use Illuminate\Cache\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
-use Illuminate\Support\Facades\RateLimiter as FacadesRateLimiter;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Http\Request;   
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,7 +32,7 @@ class AppServiceProvider extends ServiceProvider
     }
     protected function configureRateLimiting(): void
     {
-        FacadesRateLimiter::for('cobrancas_limiter', function (Request $request) {
+        RateLimiter::for('cobrancas_limiter', function (Request $request) {
             return Limit::perMinute(20)->by($request->user()?->id ?: $request->ip());
         });
     }
