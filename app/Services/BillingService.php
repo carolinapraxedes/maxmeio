@@ -46,8 +46,8 @@ class BillingService
             }
 
             // 5. Atualização de valor pago manualmente (se houver)
-            if (isset($data['paid_amount'])) {
-                $billing->paid_amount = $data['paid_amount'];
+            if (isset($data['partial_paid'])) {
+                $billing->partial_paid = $data['partial_paid'];
                 $this->syncStatusWithPayment($billing);
             }
 
@@ -63,18 +63,18 @@ class BillingService
     private function applyCredits(Billing $billing): void
     {
         $client = $billing->contract->client;
-        $remaining = $billing->remaining_amount;
+        $remaining = $billing->pending_balance;
 
         if ($client->credit_balance > 0 && $remaining > 0) {
             $amountToUse = min($client->credit_balance, $remaining);
             
             // Subtrai do saldo do cliente e adiciona ao pago da cobrança
             $client->decrement('credit_balance', $amountToUse);
-            $billing->paid_amount += $amountToUse;
+            $billing->partial_paid += $amountToUse;
         }
 
         // Se o saldo cobriu tudo, fica PAGO, senão PAGO_PARCIAL
-        $billing->status = ($billing->remaining_amount <= 0) 
+        $billing->status = ($billing->pending_balance <= 0) 
             ? BillingStatus::PAID 
             : BillingStatus::PARTIAL_PAID;
     }
@@ -84,9 +84,9 @@ class BillingService
      */
     private function syncStatusWithPayment(Billing $billing): void
     {
-        if ($billing->paid_amount >= $billing->total_amount) {
+        if ($billing->partial_paid >= $billing->total_amount) {
             $billing->status = BillingStatus::PAID;
-        } elseif ($billing->paid_amount > 0) {
+        } elseif ($billing->partial_paid > 0) {
             $billing->status = BillingStatus::PARTIAL_PAID;
         }
     }

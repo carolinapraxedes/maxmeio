@@ -19,15 +19,13 @@ class BillingFactory extends Factory
      */
     public function definition(): array
     {
-        $contract = Contract::inRandomOrder()->first() ?? Contract::factory();
+       // $contract = Contract::inRandomOrder()->first() ?? Contract::factory();
 
         return [
-            'contract_id' => $contract->id,
+            'contract_id' =>Contract::factory(),
             'status' => BillingStatus::PENDING->value,
             'due_date' => fake()->dateTimeBetween('-1 month', '+1 month'),
-            
-            'total_amount' => $contract->total_value, 
-            'paid_amount' => 0,
+            'partial_paid' => 0,
             'cancellation_reason' => null,
         ];
     }

@@ -21,7 +21,7 @@ class Contract extends Model
         if (!$this->date_end) {
             return true;
         }
-        // Verifica se a data de hoje é menor ou igual à data de término
+        
         return Carbon::now()->startOfDay()->lte(Carbon::parse($this->date_end));
     }
 

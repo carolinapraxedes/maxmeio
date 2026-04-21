@@ -15,8 +15,7 @@ class Billing extends Model
         'contract_id', 
         'status', 
         'due_date', 
-        'total_amount', 
-        'paid_amount', 
+        'partial_paid', 
         'cancellation_reason'
     ];
 
@@ -25,16 +24,22 @@ class Billing extends Model
     {
         return [
             'status' => BillingStatus::class,
-            'total_amount' => 'float',
-            'paid_amount' => 'float',
+            'partial_paid' => 'float',
             'due_date' => 'date',
         ];
     }
-    protected $appends = ['remaining_amount'];
 
-    public function getRemainingAmountAttribute(): float
+    protected $appends = ['pending_balance', 'total_amount']; 
+    
+    public function getTotalAmountAttribute(): float
     {
-        return (float) max(0, $this->total_amount - $this->paid_amount);
+        return $this->contract ? (float) $this->contract->total_value : 0.0;
+    }
+
+    public function getPendingBalanceAttribute(): float
+    {
+        // Agora usa o total_amount calculado acima
+        return (float) max(0, $this->total_amount - $this->partial_paid);
     }
 
     public function contract(): BelongsTo

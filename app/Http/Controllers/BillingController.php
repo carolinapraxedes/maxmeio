@@ -18,8 +18,8 @@ class BillingController extends Controller
     public function index()
     {
         try {
-            // Buscamos as cobranças carregando o contrato e o cliente de uma só vez (Performance!)
-            $billings = Billing::with(['contract.client'])->get();
+            
+            $billings = Billing::with(['contract.client', 'contract.items'])->get();
 
             return response()->json([
                 'status' => 'success',
@@ -59,7 +59,7 @@ class BillingController extends Controller
             $billing = Billing::create([
                 'contract_id'  => $contract->id,
                 'total_amount' => $amount,
-                'paid_amount'  => 0, // Começa zerado
+                'partial_paid'  => 0, // Começa zerado
                 'due_date'     => $validated['due_date'],
                 'status'       => BillingStatus::PENDING, 
             ]);
@@ -106,7 +106,7 @@ class BillingController extends Controller
 
             $validated = $request->validate([
                 'status' => 'sometimes|string',
-                'paid_amount' => 'sometimes|numeric|min:0',
+                'partial_paid' => 'sometimes|numeric|min:0',
                 'cancellation_reason' => 'required_if:status,cancelado|string|min:10'
             ]);
 
@@ -125,12 +125,12 @@ class BillingController extends Controller
             }
 
             // 2. Lógica de Pagamento Parcial (mantendo a segurança do Enum)
-            if ($request->has('paid_amount')) {
-                $billing->paid_amount = $validated['paid_amount'];
+            if ($request->has('partial_paid')) {
+                $billing->partial_paid = $validated['partial_paid'];
                 
-                if ($billing->paid_amount >= $billing->total_amount) {
+                if ($billing->partial_paid >= $billing->total_amount) {
                     $billing->status = BillingStatus::PAID;
-                } elseif ($billing->paid_amount > 0) {
+                } elseif ($billing->partial_paid > 0) {
                     $billing->status = BillingStatus::PARTIAL_PAID;
                 }
             }

@@ -14,52 +14,59 @@ class BillingSeeder extends Seeder
      */
     public function run(): void
     {
-        $contract = Contract::first();
+        $contracts = Contract::inRandomOrder()->take(5)->get();
 
-        if (!$contract) {
+        if ($contracts->count() < 5) {
+            $this->command->error('Precisa de pelo menos 5 contratos para rodar os cenários de teste.');
             return;
         }
 
-        // 1. Billig paid
+        // ID 1: PAID
         Billing::factory()->create([
-            'contract_id' => $contract->id,
-            'status' => BillingStatus::PAID->value,
-            'total_amount' => 1500.00,
-            'paid_amount' => 1500.00,
+            'contract_id' => $contracts[0]->id,
+            'status' => BillingStatus::PAID,
+            'partial_paid' => $contracts[0]->total_value,
             'due_date' => now()->subDays(10),
         ]);
 
-        // 2. Billing partial paid
+        // ID 2: PARTIAL PAID
         Billing::factory()->create([
-            'contract_id' => $contract->id,
-            'status' => BillingStatus::PARTIAL_PAID->value,
-            'total_amount' => 1000.00,
-            'paid_amount' => 400.00,
+            'contract_id' => $contracts[1]->id,
+            'status' => BillingStatus::PARTIAL_PAID,
+            'partial_paid' => round($contracts[1]->total_value / 2, 2),
             'due_date' => now()->subDays(5),
         ]);
 
-        // 3. Billing overdue 
+        // ID 3: OVERDUE (Vencido)
         Billing::factory()->create([
-            'contract_id' => $contract->id,
-            'status' => BillingStatus::OVERDUE->value,
-            'total_amount' => 2000.00,
-            'paid_amount' => 0,
+            'contract_id' => $contracts[2]->id,
+            'status' => BillingStatus::OVERDUE,
+            'partial_paid' => 0,
             'due_date' => now()->subMonths(1),
         ]);
 
-        // 4. Billing canceled
+        // ID 4: CANCELLED
         Billing::factory()->create([
-            'contract_id' => $contract->id,
-            'status' => BillingStatus::CANCELLED->value,
-            'total_amount' => 500.00,
-            'paid_amount' => 0,
-            'cancellation_reason' => 'Contrato rescindido pelo cliente antes do faturamento.',
-            'due_date' => now()->addDays(15),
+            'contract_id' => $contracts[3]->id,
+            'status' => BillingStatus::CANCELLED,
+            'partial_paid' => 0,
+            'cancellation_reason' => 'Cliente solicitou encerramento por motivos financeiros.',
+            'due_date' => now()->addDays(10),
         ]);
 
-        // 5. Random Billings
-        Billing::factory(5)->create([
-            'status' => BillingStatus::PENDING->value
+        // ID 5: PENDING
+        Billing::factory()->create([
+            'contract_id' => $contracts[4]->id,
+            'status' => BillingStatus::PENDING,
+            'partial_paid' => 0,
+            'due_date' => now()->addDays(20),
+        ]);
+
+        // Opcional: Gerar mais dados aleatórios para encher a paginação
+        Billing::factory(10)->create([
+            'contract_id' => fn() => Contract::inRandomOrder()->first()->id,
+            'status' => BillingStatus::PENDING,
+            'partial_paid' => 0,
         ]);
     }
 }

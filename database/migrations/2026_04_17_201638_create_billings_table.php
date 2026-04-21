@@ -17,8 +17,7 @@ return new class extends Migration
             $table->foreignId('contract_id')->constrained('contracts');     
             $table->string('status')->default(BillingStatus::PENDING->value);          
             $table->date('due_date'); // data_vencimento 
-            $table->decimal('total_amount', 15, 2); // Valor original da cobrança
-            $table->decimal('paid_amount', 15, 2)->default(0); // valor_pago (acumulado)      
+            $table->decimal('partial_paid', 10, 2)->default(0); // valor_pago (acumulado)      
             $table->text('cancellation_reason')->nullable(); 
             $table->timestamps();
         });

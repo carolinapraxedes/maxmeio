@@ -49,15 +49,15 @@ class ContractSeeder extends Seeder
                 'client_id' => $client->id,
             ]);
 
-            Contract::factory(5)
+            Contract::factory(10)
             ->make()
             ->each(function ($contract) {
                 // Atribui a um cliente aleatório já existente
                 $contract->client_id = Client::inRandomOrder()->first()->id;
                 $contract->save();
 
-                // Cria de 1 a 4 itens para este contrato específico
-                ContractItem::factory(rand(1, 4))->create([
+                // Cria de 1 a 3 itens para este contrato específico
+                ContractItem::factory(rand(1, 3))->create([
                     'contract_id' => $contract->id
                 ]);
             });
