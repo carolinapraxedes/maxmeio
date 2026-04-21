@@ -21,6 +21,9 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [DashboardController::class, 'index']);
 
+Route::get('/cobrancas', [BillingController::class, 'index'])
+    ->middleware('throttle:cobrancas_limiter');
+
 Route::apiResource('clients', ClientController::class);
 Route::apiResource('contracts', ContractController::class);
 Route::apiResource('contract-items', ContractItemController::class)->except(['index', 'show']);

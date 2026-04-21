@@ -9,34 +9,97 @@ use Exception;
 use App\Enums\BillingStatus;
 use App\Exceptions\TransitionException;
 use App\Services\BillingService;
+use Symfony\Component\HttpFoundation\Response;
 
 class BillingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    // /**
+    //  * Display a listing of the resource.
+    // *Para fins de teste
+    // *public function index()
+    // {
+    //     try {
+            
+    //         $billings = Billing::with(['contract.client', 'contract.items'])->get();
+
+    //         return response()->json([
+    //             'status' => 'success',
+    //             'code'   => 200,
+    //             'message' => 'Listagem de cobranças recuperada.',
+    //             'data'   => $billings
+    //         ], 200);
+
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'status' => 'error',
+    //             'code'   => 500,
+    //             'message' => 'Erro ao listar cobranças.',
+    //             'msg_error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }*/
+
+    public function index(Request $request)
     {
         try {
-            
-            $billings = Billing::with(['contract.client', 'contract.items'])->get();
+            // 1. Iniciamos a query com Eager Loading (o seu 'with')
+            // Importante: Não usamos ->get() aqui ainda, pois vamos aplicar filtros.
+            $query = Billing::with(['contract.client', 'contract.items']);
+
+            // 2. Filtro por múltiplos status (Ex: ?status=pendente,pago)
+            if ($request->has('status')) {
+                $status = is_array($request->status) ? $request->status : explode(',', $request->status);
+                $query->whereIn('status', $status);
+            }
+
+            // 3. Filtro por intervalo de datas
+            if ($request->filled('date_from')) {
+                $query->whereDate('created_at', '>=', $request->date_from);
+            }
+            if ($request->filled('date_to')) {
+                $query->whereDate('created_at', '<=', $request->date_to);
+            }
+
+            // 4. Busca por nome ou documento do cliente
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->whereHas('contract.client', function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('document', 'like', "%{$search}%");
+                });
+            }
+
+            // 5. Ordenação por campos específicos (Whitelist de segurança)
+            $allowedSorts = ['id', 'status', 'created_at', 'partial_paid'];
+            $sortField = in_array($request->sort_by, $allowedSorts) ? $request->sort_by : 'created_at';
+            $sortOrder = $request->order === 'asc' ? 'asc' : 'desc';
+            $query->orderBy($sortField, $sortOrder);
+
+            // 6. Paginação (Obrigatório pelo enunciado)
+            // O paginate() já retorna um objeto com 'data', 'current_page', 'total', etc.
+            $perPage = $request->get('per_page', 15);
+            $paginatedData = $query->paginate($perPage);
+            $statusCode = Response::HTTP_OK; 
 
             return response()->json([
                 'status' => 'success',
-                'code'   => 200,
+                'code'   => $statusCode,
                 'message' => 'Listagem de cobranças recuperada.',
-                'data'   => $billings
-            ], 200);
+                'data'   => $paginatedData 
+            ], $statusCode);
 
         } catch (\Exception $e) {
+            $errorCode = Response::HTTP_INTERNAL_SERVER_ERROR;
             return response()->json([
                 'status' => 'error',
-                'code'   => 500,
+                'code'   => $errorCode,
                 'message' => 'Erro ao listar cobranças.',
                 'msg_error' => $e->getMessage()
-            ], 500);
+            ], $errorCode);
         }
     }
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -59,7 +122,7 @@ class BillingController extends Controller
             $billing = Billing::create([
                 'contract_id'  => $contract->id,
                 'total_amount' => $amount,
-                'partial_paid'  => 0, // Começa zerado
+                'partial_paid'  => 0, 
                 'due_date'     => $validated['due_date'],
                 'status'       => BillingStatus::PENDING, 
             ]);
