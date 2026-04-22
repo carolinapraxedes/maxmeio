@@ -14,32 +14,23 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-// 1. Criar Utilizador Administrador (Acesso Total)
-        $admin = User::create([
-            'name' => 'Admin Sistema',
-            'email' => 'admin@agencia.com',
-            'password' => Hash::make('password'), 
-            'email_verified_at' => now(),
-        ]);
-        $admin->assignRole('admin');
 
-
-        $financial = User::create([
+        User::create([
             'name' => 'Ana Financeiro',
             'email' => 'financeiro@agencia.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $financial->assignRole('financial');
+        
 
 
-        $manager = User::create([
+        User::create([
             'name' => 'Bruno Gestor OS',
             'email' => 'os@agencia.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-        $manager->assignRole('os_manager');
+        
 
         
         User::factory(5)->create();

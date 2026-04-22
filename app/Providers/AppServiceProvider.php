@@ -31,9 +31,7 @@ class AppServiceProvider extends ServiceProvider
         Billing::observe(BillingObserver::class);
         $this->configureRateLimiting();
         //super admin
-        Gate::before(function ($user, $ability) {
-            return $user->hasRole('admin') ? true : null;
-        });
+
 
     }
     protected function configureRateLimiting(): void
