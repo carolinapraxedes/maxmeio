@@ -17,7 +17,7 @@ Siga os passos abaixo para colocar o projeto em funcionamento:
 ### 1. Clonar o Repositório
 
 ```
-git clone [https://github.com/seu-usuario/seu-repositorio.git](https://github.com/seu-usuario/seu-repositorio.git)
+git clone [https://github.com/carolinapraxedes/maxmeio.git](https://github.com/carolinapraxedes/maxmeio.git)
 ```
 Em seguida:
 
